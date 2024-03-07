@@ -1,6 +1,8 @@
 package net.nerdypuzzle.endbiomes.elements;
 
+import net.mcreator.generator.GeneratorFlavor;
 import net.mcreator.minecraft.ElementUtil;
+import net.mcreator.plugin.PluginLoader;
 import net.mcreator.ui.MCreator;
 import net.mcreator.ui.component.util.PanelUtils;
 import net.mcreator.ui.help.HelpUtils;
@@ -46,6 +48,8 @@ public class EndstoneGUI extends ModElementGUI<Endstone> {
     }
 
     protected AggregatedValidationResult validatePage(int i) {
+        if (PluginLoader.INSTANCE.getPlugins().stream().filter((plugin) -> { return plugin.getID().equals("forge_mixins"); }).toList().isEmpty() && mcreator.getGenerator().getGeneratorConfiguration().getGeneratorFlavor() != GeneratorFlavor.FABRIC)
+            return new AggregatedValidationResult.FAIL(L10N.t("elementgui.endstone.needs_mixins", new Object[0]));
         return new AggregatedValidationResult(page1group);
     }
 
