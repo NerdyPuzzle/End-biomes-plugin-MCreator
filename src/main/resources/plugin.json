@@ -1,0 +1,13 @@
+{
+  "id": "end_biomes",
+  "minversion": 202300400000,
+  "maxversion": 202300499999,
+  "weight": 3005,
+  "javaplugin": "net.nerdypuzzle.endbiomes.Launcher",
+  "info": {
+    "name": "End biomes",
+    "version": "2.0",
+    "description": "Adds a new element to allow for the creation of end biomes",
+    "author": "NerdyPuzzle"
+  }
+}
