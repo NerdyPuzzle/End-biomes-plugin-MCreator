@@ -1,7 +1,7 @@
 {
   "id": "end_biomes",
-  "minversion": 202300400000,
-  "maxversion": 202300499999,
+  "minversion": 202300300000,
+  "maxversion": 202300399999,
   "weight": 3005,
   "javaplugin": "net.nerdypuzzle.endbiomes.Launcher",
   "info": {

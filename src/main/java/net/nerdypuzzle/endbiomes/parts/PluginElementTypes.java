@@ -1,5 +1,6 @@
 package net.nerdypuzzle.endbiomes.parts;
 
+import net.mcreator.element.BaseType;
 import net.mcreator.element.ModElementType;
 import net.nerdypuzzle.endbiomes.elements.EndBiome;
 import net.nerdypuzzle.endbiomes.elements.EndBiomeGUI;
@@ -15,11 +16,11 @@ public class PluginElementTypes {
     public static void load() {
 
         ENDBIOME = register(
-                new ModElementType<>("endbiome", (Character) 'E', EndBiomeGUI::new, EndBiome.class)
+                new ModElementType<>("endbiome", (Character) 'E', BaseType.OTHER, EndBiomeGUI::new, EndBiome.class)
         );
 
         ENDSTONE = register(
-                new ModElementType<>("endstone", (Character) null, EndstoneGUI::new, Endstone.class)
+                new ModElementType<>("endstone", (Character) null, BaseType.OTHER, EndstoneGUI::new, Endstone.class)
         );
 
     }

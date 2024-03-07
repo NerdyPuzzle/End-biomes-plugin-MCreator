@@ -3,7 +3,6 @@ package net.nerdypuzzle.endbiomes.elements;
 import net.mcreator.element.ModElementType;
 import net.mcreator.element.types.Biome;
 import net.mcreator.generator.GeneratorFlavor;
-import net.mcreator.plugin.Plugin;
 import net.mcreator.plugin.PluginLoader;
 import net.mcreator.ui.MCreator;
 import net.mcreator.ui.component.SearchableComboBox;
@@ -12,7 +11,6 @@ import net.mcreator.ui.component.util.ComponentUtils;
 import net.mcreator.ui.component.util.PanelUtils;
 import net.mcreator.ui.help.HelpUtils;
 import net.mcreator.ui.init.L10N;
-import net.mcreator.ui.laf.themes.Theme;
 import net.mcreator.ui.modgui.ModElementGUI;
 import net.mcreator.ui.validation.AggregatedValidationResult;
 import net.mcreator.ui.validation.ValidationGroup;
@@ -20,7 +18,6 @@ import net.mcreator.util.ListUtils;
 import net.mcreator.workspace.elements.ModElement;
 import net.nerdypuzzle.endbiomes.parts.PluginElementTypes;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
@@ -65,7 +62,7 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
         mainPanel.add(generationType);
         mainPanel.add(HelpUtils.wrapWithHelpButton(this.withEntry("endbiome/weight"), L10N.label("elementgui.endbiome.weight", new Object[0])));
         mainPanel.add(weight);
-        mainPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Theme.current().getForegroundColor(), 1), L10N.t("elementgui.endbiome.props_border", new Object[0]), 4, 0, this.getFont(), Theme.current().getForegroundColor()));
+        mainPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder((Color)UIManager.get("MCreatorLAF.BRIGHT_COLOR"), 1), L10N.t("elementgui.endbiome.props_border", new Object[0]), 4, 0, this.getFont(), (Color)UIManager.get("MCreatorLAF.BRIGHT_COLOR")));
 
         JPanel subBiomes = new JPanel(new GridLayout(2, 2, 0, 2));
         subBiomes.setOpaque(false);
@@ -73,7 +70,7 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
         subBiomes.add(midlands);
         subBiomes.add(HelpUtils.wrapWithHelpButton(this.withEntry("endbiome/barrens"), L10N.label("elementgui.endbiome.barrens", new Object[0])));
         subBiomes.add(barrens);
-        subBiomes.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Theme.current().getForegroundColor(), 1), L10N.t("elementgui.endbiome.subbiomes_border", new Object[0]), 4, 0, this.getFont(), Theme.current().getForegroundColor()));
+        subBiomes.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder((Color)UIManager.get("MCreatorLAF.BRIGHT_COLOR"), 1), L10N.t("elementgui.endbiome.subbiomes_border", new Object[0]), 4, 0, this.getFont(), (Color)UIManager.get("MCreatorLAF.BRIGHT_COLOR")));
 
         generationType.addActionListener((e) -> {
             midlands.setEnabled(generationType.getSelectedItem().equals("Highlands"));

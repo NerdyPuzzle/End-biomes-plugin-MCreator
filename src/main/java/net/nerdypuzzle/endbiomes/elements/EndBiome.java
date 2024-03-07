@@ -3,7 +3,6 @@ package net.nerdypuzzle.endbiomes.elements;
 import net.mcreator.element.GeneratableElement;
 import net.mcreator.workspace.elements.ModElement;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class EndBiome extends GeneratableElement {
