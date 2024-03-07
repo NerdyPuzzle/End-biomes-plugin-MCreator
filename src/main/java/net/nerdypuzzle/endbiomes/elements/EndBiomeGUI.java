@@ -3,7 +3,6 @@ package net.nerdypuzzle.endbiomes.elements;
 import net.mcreator.element.ModElementType;
 import net.mcreator.element.types.Biome;
 import net.mcreator.generator.GeneratorFlavor;
-import net.mcreator.plugin.Plugin;
 import net.mcreator.plugin.PluginLoader;
 import net.mcreator.ui.MCreator;
 import net.mcreator.ui.component.SearchableComboBox;
@@ -20,7 +19,6 @@ import net.mcreator.util.ListUtils;
 import net.mcreator.workspace.elements.ModElement;
 import net.nerdypuzzle.endbiomes.parts.PluginElementTypes;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
