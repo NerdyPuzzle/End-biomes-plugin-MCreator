@@ -120,11 +120,22 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
         return new AggregatedValidationResult(this.page1group);
     }
 
+    private void disableGeneration(Biome element) {
+        element.spawnBiome = false;
+        element.spawnBiomeNether = false;
+        element.spawnInCaves = false;
+    }
     protected void afterGeneratableElementStored() {
         Biome modified = (Biome) mcreator.getWorkspace().getModElementByName(biome.getSelectedItem()).getGeneratableElement();
-        modified.spawnBiome = false;
-        modified.spawnBiomeNether = false;
-        modified.spawnInCaves = false;
+        disableGeneration(modified);
+        if (!midlands.getSelectedItem().equals("Vanilla")) {
+            Biome modified_midlands = (Biome) mcreator.getWorkspace().getModElementByName(midlands.getSelectedItem()).getGeneratableElement();
+            disableGeneration(modified_midlands);
+        }
+        if (!barrens.getSelectedItem().equals("Vanilla")) {
+            Biome modified_barrens = (Biome) mcreator.getWorkspace().getModElementByName(barrens.getSelectedItem()).getGeneratableElement();
+            disableGeneration(modified_barrens);
+        }
     }
 
     public void openInEditingMode(EndBiome endbiome) {
