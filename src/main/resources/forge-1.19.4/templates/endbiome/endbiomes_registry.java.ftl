@@ -18,8 +18,8 @@ public class ${JavaModName}EndBiomes {
                 addMidlandsBiome(ResourceKey.create(Registries.BIOME, new ResourceLocation("minecraft:end_highlands")),
                     ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}:${w.getWorkspace().getModElementByName(biome.midlands).getRegistryName()}")), ${biome.weight}d);
             <#else>
-                addMidlandsBiome(ResourceKey.create(Registries.BIOME, new ResourceLocation("minecraft:end_highlands")),
-                    ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}:${w.getWorkspace().getModElementByName(biome.midlands).getRegistryName()}")), ${biome.weight}d);
+                addBarrensBiome(ResourceKey.create(Registries.BIOME, new ResourceLocation("minecraft:end_highlands")),
+                    ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}:${w.getWorkspace().getModElementByName(biome.barrens).getRegistryName()}")), ${biome.weight}d);
             </#if>
 
             <#if biome.generationType == "Highlands" && biome.midlands != "Vanilla">
