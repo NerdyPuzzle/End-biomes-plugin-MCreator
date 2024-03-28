@@ -91,10 +91,10 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
             return var.getType() == ModElementType.BIOME;
         }).map(ModElement::getName).collect(Collectors.toList()));
         ComboBoxUtil.updateComboBoxContents(midlands, ListUtils.merge(Collections.singleton("Vanilla"), this.mcreator.getWorkspace().getModElements().stream().filter((var) -> {
-            return var.getType() == ModElementType.BIOME && (biome.getSelectedItem() == null || var != mcreator.getWorkspace().getModElementByName(biome.getSelectedItem()));
+            return var.getType() == ModElementType.BIOME;
         }).map(ModElement::getName).collect(Collectors.toList())), "Vanilla");
         ComboBoxUtil.updateComboBoxContents(barrens, ListUtils.merge(Collections.singleton("Vanilla"), this.mcreator.getWorkspace().getModElements().stream().filter((var) -> {
-            return var.getType() == ModElementType.BIOME && (biome.getSelectedItem() == null || var != mcreator.getWorkspace().getModElementByName(biome.getSelectedItem()));
+            return var.getType() == ModElementType.BIOME;
         }).map(ModElement::getName).collect(Collectors.toList())), "Vanilla");
     }
 
@@ -113,8 +113,6 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
             return new AggregatedValidationResult.FAIL(L10N.t("elementgui.endbiome.needs_mixins", new Object[0]));
         if (biome.getSelectedItem() == null)
             return new AggregatedValidationResult.FAIL(L10N.t("elementgui.endbiome.needs_biome", new Object[0]));
-        if (!midlands.getSelectedItem().equals("Vanilla") && !barrens.getSelectedItem().equals("Vanilla") && midlands.getSelectedItem().equals(barrens.getSelectedItem()))
-            return new AggregatedValidationResult.FAIL(L10N.t("elementgui.endbiome.same_subbiomes", new Object[0]));
         if (isEndBiome(biome.getSelectedItem(), getModElement(), mcreator))
             return new AggregatedValidationResult.FAIL(L10N.t("elementgui.endbiome.is_end", new Object[0]));
         return new AggregatedValidationResult(this.page1group);

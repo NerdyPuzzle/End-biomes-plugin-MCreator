@@ -2,42 +2,49 @@ package ${package}.init;
 
 <#include "../mcitems.ftl">
 
-<#macro genSurfaceRules biome>
-((NoiseGeneratorSettingsAccess)(Object)noiseGeneratorSettings).addSurfaceRule(SurfaceRules.sequence(
-SurfaceRules.ifTrue(SurfaceRules.isBiome(ResourceKey.create(Registry.BIOME_REGISTRY, new ResourceLocation("${modid}:${biome.getModElement().getRegistryName()}"))),
-    SurfaceRules.sequence(
-        SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.state(${mappedBlockToBlockStateCode(biome.groundBlock)})),
-        SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, SurfaceRules.state(${mappedBlockToBlockStateCode(biome.undergroundBlock)})))),
-    noiseGeneratorSettings.surfaceRule()));
+<#macro getSurfaceRules element>
+	registerSurfaceRules(new ResourceLocation("${modid}:${element.getModElement().getRegistryName()}"), noiseGeneratorSettings,
+		${mappedBlockToBlockStateCode(element.groundBlock)}, ${mappedBlockToBlockStateCode(element.undergroundBlock)});
 </#macro>
 
 @Mod.EventBusSubscriber
 public class ${JavaModName}SurfaceRules {
 
-    @SubscribeEvent
-    public static void init(ServerAboutToStartEvent event) {
-        LevelStem levelStem = event.getServer().getWorldData().worldGenSettings().dimensions().get(LevelStem.END);
-        ChunkGenerator chunkGenerator = levelStem.generator();
-        boolean hasEndBiomes = chunkGenerator.getBiomeSource().possibleBiomes().stream().anyMatch(biomeHolder ->
-            biomeHolder.unwrapKey().orElseThrow().location().getNamespace().equals("${modid}"));
+	@SubscribeEvent
+	public static void init(ServerAboutToStartEvent event) {
+		LevelStem levelStem = event.getServer().getWorldData().worldGenSettings().dimensions().get(LevelStem.END);
+		ChunkGenerator chunkGenerator = levelStem.generator();
+		boolean hasEndBiomes = chunkGenerator.getBiomeSource().possibleBiomes().stream().anyMatch(biomeHolder ->
+			biomeHolder.unwrapKey().orElseThrow().location().getNamespace().equals("${modid}"));
 
-        if (hasEndBiomes) {
-            if (chunkGenerator instanceof NoiseBasedChunkGenerator generator) {
-                NoiseGeneratorSettings noiseGeneratorSettings = generator.settings.value();
+		if (hasEndBiomes) {
+			if (chunkGenerator instanceof NoiseBasedChunkGenerator generator) {
+				NoiseGeneratorSettings noiseGeneratorSettings = generator.settings.value();
 
-                <#list endbiomes as biome>
-                    <@genSurfaceRules w.getWorkspace().getModElementByName(biome.biome).getGeneratableElement()/>
+				<#list endbiomes as biome>
+					<@getSurfaceRules w.getWorkspace().getModElementByName(biome.biome).getGeneratableElement()/>
 
-                    <#if biome.generationType == "Highlands" && biome.midlands != "Vanilla">
-                        <@genSurfaceRules w.getWorkspace().getModElementByName(biome.midlands).getGeneratableElement()/>
-                    </#if>
+					<#if biome.generationType == "Highlands" && biome.midlands != "Vanilla" && biome.midlands != biome.biome>
+						<@getSurfaceRules w.getWorkspace().getModElementByName(biome.midlands).getGeneratableElement()/>
+					</#if>
 
-                    <#if biome.generationType == "Highlands" && biome.barrens != "Vanilla">
-                        <@genSurfaceRules w.getWorkspace().getModElementByName(biome.barrens).getGeneratableElement()/>
-                    </#if>
-                </#list>
-            }
-        }
-    }
+					<#if biome.generationType == "Highlands" && biome.barrens != "Vanilla" && biome.barrens != biome.biome>
+						<@getSurfaceRules w.getWorkspace().getModElementByName(biome.barrens).getGeneratableElement()/>
+					</#if>
+				</#list>
+			}
+		}
+	}
+
+	public static void registerSurfaceRules(ResourceLocation biome, NoiseGeneratorSettings noiseGeneratorSettings, BlockState groundBlock, BlockState undergroundBlock) {
+		((NoiseGeneratorSettingsAccess)(Object)noiseGeneratorSettings).addSurfaceRule(SurfaceRules.sequence(
+		SurfaceRules.ifTrue(SurfaceRules.isBiome(ResourceKey.create(Registry.BIOME_REGISTRY, biome)),
+			SurfaceRules.sequence(
+				SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.state(groundBlock)),
+				SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, SurfaceRules.state(undergroundBlock))
+				)
+			),
+			noiseGeneratorSettings.surfaceRule()));
+	}
 
 }
