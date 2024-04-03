@@ -14,6 +14,9 @@ public class ${JavaModName}SurfaceRules {
 	public static void init(ServerAboutToStartEvent event) {
 		LevelStem levelStem = event.getServer().getWorldData().worldGenSettings().dimensions().get(LevelStem.END);
 		ChunkGenerator chunkGenerator = levelStem.generator();
+
+		((IExtendedTheEndBiomeSource)chunkGenerator.getBiomeSource()).initializeForTerraBlender(event.getServer().registryAccess(), event.getServer().getWorldData().worldGenSettings().seed());
+
 		boolean hasEndBiomes = chunkGenerator.getBiomeSource().possibleBiomes().stream().anyMatch(biomeHolder ->
 			biomeHolder.unwrapKey().orElseThrow().location().getNamespace().equals("${modid}"));
 
