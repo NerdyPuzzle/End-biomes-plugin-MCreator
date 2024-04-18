@@ -1,5 +1,7 @@
 package ${package}.mixins;
 
+import com.google.common.base.Suppliers;
+
 import com.mojang.serialization.Codec;
 
 import org.spongepowered.asm.mixin.Unique;

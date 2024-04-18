@@ -1,5 +1,7 @@
 package ${package}.mixins;
 
+import com.google.common.base.Preconditions;
+
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(Climate.Sampler.class)

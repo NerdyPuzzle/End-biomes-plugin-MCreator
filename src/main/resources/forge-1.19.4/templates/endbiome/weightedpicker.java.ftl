@@ -1,5 +1,7 @@
 package ${package}.endbiomes;
 
+import com.google.common.base.Preconditions;
+
 public final class WeightedPicker<T> {
 	private double currentTotal;
 	private final List<WeightedEntry<T>> entries;

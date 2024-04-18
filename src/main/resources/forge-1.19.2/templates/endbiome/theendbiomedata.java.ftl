@@ -1,5 +1,7 @@
 package ${package}.endbiomes;
 
+import com.google.common.base.Preconditions;
+
 import net.minecraft.world.level.biome.Biomes;
 
 import javax.annotation.Nullable;
