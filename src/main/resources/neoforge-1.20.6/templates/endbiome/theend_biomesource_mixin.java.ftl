@@ -14,12 +14,51 @@ public class TheEndBiomeSourceMixin extends BiomeSourceMixin {
     private List<Supplier<Object>> overrides = new ArrayList<>();
     @Unique
     private boolean biomeMapModified = false;
+	@Shadow
+	@Mutable
+	@Final
+	static MapCodec<TheEndBiomeSource> CODEC;
+
+	/**
+	 * Modifies the codec, so it calls the static factory method that gives us access to the
+	 * full biome registry instead of just the pre-defined biomes that vanilla uses.
+	 */
+	@Inject(method = "<clinit>", at = @At("TAIL"))
+	private static void modifyCodec(CallbackInfo ci) {
+		CODEC = RecordCodecBuilder.mapCodec((instance) -> {
+			return instance.group(RegistryOps.retrieveGetter(Registries.BIOME)).apply(instance, instance.stable(TheEndBiomeSource::create));
+		});
+	}
+
+	/**
+	 * Captures the biome registry at the beginning of the static factory method to allow access to it in the
+	 * constructor.
+	 */
+	@Inject(method = "create", at = @At("HEAD"))
+	private static void rememberLookup(HolderGetter<Biome> biomes, CallbackInfoReturnable<?> ci) {
+		TheEndBiomeData.biomeRegistry.set(biomes);
+	}
+
+	/**
+	 * Frees up the captured biome registry.
+	 */
+	@Inject(method = "create", at = @At("TAIL"))
+	private static void clearLookup(HolderGetter<Biome> biomes, CallbackInfoReturnable<?> ci) {
+		TheEndBiomeData.biomeRegistry.remove();
+	}
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(Registry<Biome> biomeRegistry, CallbackInfo ci) {
+    private void init(Holder<Biome> centerBiome, Holder<Biome> highlandsBiome, Holder<Biome> midlandsBiome, Holder<Biome> smallIslandsBiome, Holder<Biome> barrensBiome, CallbackInfo ci) {
+		HolderGetter<Biome> biomes = TheEndBiomeData.biomeRegistry.get();
+
+		if (biomes == null) {
+			throw new IllegalStateException("Biome registry not set by Mixin");
+		}
+
 		overrides.add(Suppliers.memoize(() -> {
-		    return (Object) TheEndBiomeData.createOverrides(biomeRegistry);
+			return (Object) TheEndBiomeData.createOverrides(biomes);
 		}));
+
     }
 
 	@Inject(method = "getNoiseBiome", at = @At("RETURN"), cancellable = true)
@@ -49,18 +88,19 @@ public class TheEndBiomeSourceMixin extends BiomeSourceMixin {
             }
     }
 
-    @Override
-    public void modifyBiomeSet(Set<Holder<Biome>> biomes) {
+	@Override
+	protected Set<Holder<Biome>> modifyBiomeSet(Set<Holder<Biome>> biomes) {
 	    try {
 	        var modifiedBiomes = new LinkedHashSet<>(biomes);
 		    for (Supplier<Object> override : overrides) {
 		        Field field = override.get().getClass().getField("customBiomes");
 			    modifiedBiomes.addAll(((Set<Holder<Biome>>)field.get(override.get())));
 			}
-			biomes.addAll(modifiedBiomes);
+			return Collections.unmodifiableSet(modifiedBiomes);
 		} catch (Exception e) {
 		    e.printStackTrace();
 		}
+		return biomes;
 	}
 
 }

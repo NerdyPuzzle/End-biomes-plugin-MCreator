@@ -7,7 +7,7 @@ package ${package}.init;
 		${mappedBlockToBlockStateCode(element.groundBlock)}, ${mappedBlockToBlockStateCode(element.undergroundBlock)});
 </#macro>
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class ${JavaModName}SurfaceRules {
 
 	@SubscribeEvent

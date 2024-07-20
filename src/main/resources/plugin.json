@@ -3,12 +3,11 @@
   "weight": 3005,
   "javaplugin": "net.nerdypuzzle.endbiomes.Launcher",
   "supportedversions": [
-    202400115713,
-    202400115821
+    2024002
   ],
   "info": {
     "name": "End biomes",
-    "version": "2.4",
+    "version": "2.5",
     "description": "Adds a new element to allow for the creation of end biomes",
     "author": "NerdyPuzzle"
   }
