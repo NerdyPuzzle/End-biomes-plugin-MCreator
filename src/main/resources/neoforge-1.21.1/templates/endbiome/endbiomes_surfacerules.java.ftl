@@ -3,7 +3,7 @@ package ${package}.init;
 <#include "../mcitems.ftl">
 
 <#macro getSurfaceRules element>
-	registerSurfaceRules(new ResourceLocation("${modid}:${element.getModElement().getRegistryName()}"), noiseGeneratorSettings,
+	registerSurfaceRules(ResourceLocation.parse("${modid}:${element.getModElement().getRegistryName()}"), noiseGeneratorSettings,
 		${mappedBlockToBlockStateCode(element.groundBlock)}, ${mappedBlockToBlockStateCode(element.undergroundBlock)});
 </#macro>
 

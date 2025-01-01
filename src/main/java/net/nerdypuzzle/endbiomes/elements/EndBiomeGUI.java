@@ -31,7 +31,9 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
     private final JComboBox<String> generationType;
     private final JSpinner weight;
     private final SearchableComboBox<String> midlands;
+    private final JSpinner midlandsWeight;
     private final SearchableComboBox<String> barrens;
+    private final JSpinner barrensWeight;
 
     public EndBiomeGUI(MCreator mcreator, ModElement modElement, boolean editingMode) {
         super(mcreator, modElement, editingMode);
@@ -40,6 +42,8 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
         weight = new JSpinner(new SpinnerNumberModel(1, 0.1, 1000, 0.1));
         midlands = new SearchableComboBox<>();
         barrens = new SearchableComboBox<>();
+        midlandsWeight = new JSpinner(new SpinnerNumberModel(1, 0.1, 1000, 0.1));
+        barrensWeight = new JSpinner(new SpinnerNumberModel(1, 0.1, 1000, 0.1));
         this.initGUI();
         super.finalizeGUI();
     }
@@ -65,12 +69,16 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
         mainPanel.add(weight);
         mainPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Theme.current().getForegroundColor(), 1), L10N.t("elementgui.endbiome.props_border", new Object[0]), 4, 0, this.getFont(), Theme.current().getForegroundColor()));
 
-        JPanel subBiomes = new JPanel(new GridLayout(2, 2, 0, 2));
+        JPanel subBiomes = new JPanel(new GridLayout(4, 2, 0, 2));
         subBiomes.setOpaque(false);
         subBiomes.add(HelpUtils.wrapWithHelpButton(this.withEntry("endbiome/midlands"), L10N.label("elementgui.endbiome.midlands", new Object[0])));
         subBiomes.add(midlands);
+        subBiomes.add(HelpUtils.wrapWithHelpButton(this.withEntry("endbiome/weight"), L10N.label("elementgui.endbiome.weight", new Object[0])));
+        subBiomes.add(midlandsWeight);
         subBiomes.add(HelpUtils.wrapWithHelpButton(this.withEntry("endbiome/barrens"), L10N.label("elementgui.endbiome.barrens", new Object[0])));
         subBiomes.add(barrens);
+        subBiomes.add(HelpUtils.wrapWithHelpButton(this.withEntry("endbiome/weight"), L10N.label("elementgui.endbiome.weight", new Object[0])));
+        subBiomes.add(barrensWeight);
         subBiomes.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Theme.current().getForegroundColor(), 1), L10N.t("elementgui.endbiome.subbiomes_border", new Object[0]), 4, 0, this.getFont(), Theme.current().getForegroundColor()));
 
         generationType.addActionListener((e) -> {
@@ -144,6 +152,8 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
         weight.setValue(endbiome.weight);
         midlands.setSelectedItem(endbiome.midlands);
         barrens.setSelectedItem(endbiome.barrens);
+        midlandsWeight.setValue(endbiome.midlandsWeight);
+        barrensWeight.setValue(endbiome.barrensWeight);
     }
 
     public EndBiome getElementFromGUI() {
@@ -153,6 +163,8 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
         endbiome.weight = (Number) weight.getValue();
         endbiome.midlands = midlands.getSelectedItem();
         endbiome.barrens = barrens.getSelectedItem();
+        endbiome.midlandsWeight = (Number) midlandsWeight.getValue();
+        endbiome.barrensWeight = (Number) barrensWeight.getValue();
         return endbiome;
     }
 

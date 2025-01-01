@@ -24,12 +24,12 @@ public class ${JavaModName}EndBiomes {
 
             <#if biome.generationType == "Highlands" && biome.midlands != "Vanilla">
                 TheEndBiomes.addMidlandsBiome(ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}:${w.getWorkspace().getModElementByName(biome.biome).getRegistryName()}")),
-                    ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}:${w.getWorkspace().getModElementByName(biome.midlands).getRegistryName()}")), ${biome.weight}d);
+                    ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}:${w.getWorkspace().getModElementByName(biome.midlands).getRegistryName()}")), ${biome.midlandsWeight}d);
             </#if>
 
             <#if biome.generationType == "Highlands" && biome.barrens != "Vanilla">
                 TheEndBiomes.addBarrensBiome(ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}:${w.getWorkspace().getModElementByName(biome.biome).getRegistryName()}")),
-                    ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}:${w.getWorkspace().getModElementByName(biome.barrens).getRegistryName()}")), ${biome.weight}d);
+                    ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}:${w.getWorkspace().getModElementByName(biome.barrens).getRegistryName()}")), ${biome.barrensWeight}d);
             </#if>
         </#list>
         });
