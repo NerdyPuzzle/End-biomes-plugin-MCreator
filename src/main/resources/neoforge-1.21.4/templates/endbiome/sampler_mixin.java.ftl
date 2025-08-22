@@ -1,4 +1,4 @@
-package ${package}.mixins;
+package ${package}.mixin;
 
 import com.google.common.base.Preconditions;
 

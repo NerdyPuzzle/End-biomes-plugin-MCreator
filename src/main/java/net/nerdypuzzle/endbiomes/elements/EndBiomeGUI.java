@@ -5,6 +5,7 @@ import net.mcreator.element.types.Biome;
 import net.mcreator.generator.GeneratorFlavor;
 import net.mcreator.plugin.PluginLoader;
 import net.mcreator.ui.MCreator;
+import net.mcreator.ui.MCreatorApplication;
 import net.mcreator.ui.component.SearchableComboBox;
 import net.mcreator.ui.component.util.ComboBoxUtil;
 import net.mcreator.ui.component.util.ComponentUtils;
@@ -19,8 +20,11 @@ import net.mcreator.util.ListUtils;
 import net.mcreator.workspace.elements.ModElement;
 import net.nerdypuzzle.endbiomes.parts.PluginElementTypes;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.util.stream.Collectors;
@@ -166,6 +170,10 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
         endbiome.midlandsWeight = (Number) midlandsWeight.getValue();
         endbiome.barrensWeight = (Number) barrensWeight.getValue();
         return endbiome;
+    }
+
+    @Override public @Nullable URI contextURL() throws URISyntaxException {
+        return null;
     }
 
 }

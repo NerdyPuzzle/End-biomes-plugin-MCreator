@@ -4,6 +4,7 @@ import net.mcreator.generator.GeneratorFlavor;
 import net.mcreator.minecraft.ElementUtil;
 import net.mcreator.plugin.PluginLoader;
 import net.mcreator.ui.MCreator;
+import net.mcreator.ui.MCreatorApplication;
 import net.mcreator.ui.component.util.PanelUtils;
 import net.mcreator.ui.help.HelpUtils;
 import net.mcreator.ui.init.L10N;
@@ -15,8 +16,11 @@ import net.mcreator.ui.validation.validators.MCItemHolderValidator;
 import net.mcreator.workspace.elements.ModElement;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class EndstoneGUI extends ModElementGUI<Endstone> {
     private final ValidationGroup page1group = new ValidationGroup();
@@ -62,4 +66,9 @@ public class EndstoneGUI extends ModElementGUI<Endstone> {
         endstone.block = block.getBlock();
         return endstone;
     }
+
+    @Override public @Nullable URI contextURL() throws URISyntaxException {
+        return null;
+    }
+
 }

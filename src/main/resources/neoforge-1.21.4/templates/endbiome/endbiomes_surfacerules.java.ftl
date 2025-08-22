@@ -3,16 +3,16 @@ package ${package}.init;
 <#include "../mcitems.ftl">
 
 <#macro getSurfaceRules element>
-	registerSurfaceRules(new ResourceLocation("${modid}:${element.getModElement().getRegistryName()}"), noiseGeneratorSettings,
+	registerSurfaceRules(ResourceLocation.parse("${modid}:${element.getModElement().getRegistryName()}"), noiseGeneratorSettings,
 		${mappedBlockToBlockStateCode(element.groundBlock)}, ${mappedBlockToBlockStateCode(element.undergroundBlock)});
 </#macro>
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class ${JavaModName}SurfaceRules {
 
 	@SubscribeEvent
 	public static void init(ServerAboutToStartEvent event) {
-		LevelStem levelStem = event.getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM).get(LevelStem.END);
+		LevelStem levelStem = event.getServer().registryAccess().lookupOrThrow(Registries.LEVEL_STEM).getValue(LevelStem.END);
 		ChunkGenerator chunkGenerator = levelStem.generator();
 		boolean hasEndBiomes = chunkGenerator.getBiomeSource().possibleBiomes().stream().anyMatch(biomeHolder ->
 			biomeHolder.unwrapKey().orElseThrow().location().getNamespace().equals("${modid}"));

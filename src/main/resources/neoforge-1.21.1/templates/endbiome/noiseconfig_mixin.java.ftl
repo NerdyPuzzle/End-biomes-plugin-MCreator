@@ -1,4 +1,4 @@
-package ${package}.mixins;
+package ${package}.mixin;
 
 @Mixin(RandomState.class)
 public class NoiseConfigMixin {

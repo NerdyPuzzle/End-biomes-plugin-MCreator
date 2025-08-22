@@ -1,4 +1,4 @@
-package ${package}.mixins;
+package ${package}.mixin;
 
 import com.google.common.base.Suppliers;
 
@@ -17,7 +17,7 @@ public class TheEndBiomeSourceMixin extends BiomeSourceMixin {
 	@Shadow
 	@Mutable
 	@Final
-	static Codec<TheEndBiomeSource> CODEC;
+	static MapCodec<TheEndBiomeSource> CODEC;
 
 	/**
 	 * Modifies the codec, so it calls the static factory method that gives us access to the
@@ -25,7 +25,7 @@ public class TheEndBiomeSourceMixin extends BiomeSourceMixin {
 	 */
 	@Inject(method = "<clinit>", at = @At("TAIL"))
 	private static void modifyCodec(CallbackInfo ci) {
-		CODEC = RecordCodecBuilder.create((instance) -> {
+		CODEC = RecordCodecBuilder.mapCodec((instance) -> {
 			return instance.group(RegistryOps.retrieveGetter(Registries.BIOME)).apply(instance, instance.stable(TheEndBiomeSource::create));
 		});
 	}
