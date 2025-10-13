@@ -15,7 +15,6 @@ public abstract class ChorusFlowerBlockMixin extends Block {
 		BlockState blockstate = world.getBlockState(pos.below());
 		if (<#list endstones as endstone>blockstate.is(${mappedBlockToBlock(endstone.block)}) <#sep>||</#list>) {
 			info.setReturnValue(true);
-			info.cancel();
 		}
 	}
 

@@ -95,7 +95,7 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
         topnbottom.add(PanelUtils.northAndCenterElement(mainPanel, subBiomes));
 
         pane1.add(PanelUtils.totalCenterInPanel(topnbottom));
-        addPage(pane1);
+        addPage(pane1).lazyValidate(this::validatePage);
     }
 
     public void reloadDataLists() {
@@ -121,7 +121,7 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
         return false;
     }
 
-    protected AggregatedValidationResult validatePage(int page) {
+    protected AggregatedValidationResult validatePage() {
         if (PluginLoader.INSTANCE.getPlugins().stream().filter((plugin) -> { return plugin.getID().equals("forge_mixins"); }).toList().isEmpty() && mcreator.getGenerator().getGeneratorConfiguration().getGeneratorFlavor() != GeneratorFlavor.FABRIC)
             return new AggregatedValidationResult.FAIL(L10N.t("elementgui.endbiome.needs_mixins", new Object[0]));
         if (biome.getSelectedItem() == null)
