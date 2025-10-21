@@ -40,7 +40,7 @@ public abstract class ChorusPlantBlockMixin extends PipeBlock {
             BlockState blockstate3 = p_51711_.getBlockState(p_51712_.east());
             BlockState blockstate4 = p_51711_.getBlockState(p_51712_.south());
             BlockState blockstate5 = p_51711_.getBlockState(p_51712_.west());
-            net.neoforged.neoforge.common.util.TriState soilDecision = blockstate.canSustainPlant(p_51711_, p_51712_.below(), Direction.UP, p_304771_);
+            var soilDecision = blockstate.canSustainPlant(p_51711_, p_51712_.below(), Direction.UP, p_304771_);
             cir.setReturnValue(p_304771_.trySetValue(DOWN, Boolean.valueOf(flag || soilDecision.isTrue()))
                 .trySetValue(UP, Boolean.valueOf(blockstate1.is(block) || blockstate1.is(Blocks.CHORUS_FLOWER)))
                 .trySetValue(NORTH, Boolean.valueOf(blockstate2.is(block) || blockstate2.is(Blocks.CHORUS_FLOWER)))

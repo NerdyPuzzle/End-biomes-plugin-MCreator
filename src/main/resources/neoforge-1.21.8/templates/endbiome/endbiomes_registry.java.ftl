@@ -1,6 +1,6 @@
 package ${package}.init;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber
 public class ${JavaModName}EndBiomes {
 
     @SubscribeEvent
