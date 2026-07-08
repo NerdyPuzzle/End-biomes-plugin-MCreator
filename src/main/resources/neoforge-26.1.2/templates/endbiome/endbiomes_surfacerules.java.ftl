@@ -3,7 +3,7 @@ package ${package}.init;
 <#include "../mcitems.ftl">
 
 <#macro getSurfaceRules element>
-	registerSurfaceRules(ResourceLocation.parse("${modid}:${element.getModElement().getRegistryName()}"), noiseGeneratorSettings,
+	registerSurfaceRules(Identifier.parse("${modid}:${element.getModElement().getRegistryName()}"), noiseGeneratorSettings,
 		${mappedBlockToBlockStateCode(element.groundBlock)}, ${mappedBlockToBlockStateCode(element.undergroundBlock)});
 </#macro>
 
@@ -15,11 +15,19 @@ public class ${JavaModName}SurfaceRules {
 		LevelStem levelStem = event.getServer().registryAccess().lookupOrThrow(Registries.LEVEL_STEM).getValue(LevelStem.END);
 		ChunkGenerator chunkGenerator = levelStem.generator();
 		boolean hasEndBiomes = chunkGenerator.getBiomeSource().possibleBiomes().stream().anyMatch(biomeHolder ->
-			biomeHolder.unwrapKey().orElseThrow().location().getNamespace().equals("${modid}"));
+			biomeHolder.unwrapKey().orElseThrow().identifier().getNamespace().equals("${modid}"));
 
 		if (hasEndBiomes) {
 			if (chunkGenerator instanceof NoiseBasedChunkGenerator generator) {
-				NoiseGeneratorSettings noiseGeneratorSettings = generator.settings.value();
+				NoiseGeneratorSettings noiseGeneratorSettings = null;
+
+				try {
+				    Field settingsField = NoiseBasedChunkGenerator.class.getDeclaredField("settings");
+				    settingsField.setAccessible(true);
+				    noiseGeneratorSettings = ((Holder<NoiseGeneratorSettings>) settingsField.get(generator)).value();
+				} catch (Exception e) {
+				    e.printStackTrace();
+				}
 
 				<#list endbiomes as biome>
 					<@getSurfaceRules w.getWorkspace().getModElementByName(biome.biome).getGeneratableElement()/>
@@ -36,7 +44,7 @@ public class ${JavaModName}SurfaceRules {
 		}
 	}
 
-	public static void registerSurfaceRules(ResourceLocation biome, NoiseGeneratorSettings noiseGeneratorSettings, BlockState groundBlock, BlockState undergroundBlock) {
+	public static void registerSurfaceRules(Identifier biome, NoiseGeneratorSettings noiseGeneratorSettings, BlockState groundBlock, BlockState undergroundBlock) {
 		((NoiseGeneratorSettingsAccess)(Object)noiseGeneratorSettings).addSurfaceRule(SurfaceRules.sequence(
 		SurfaceRules.ifTrue(SurfaceRules.isBiome(ResourceKey.create(Registries.BIOME, biome)),
 			SurfaceRules.sequence(
