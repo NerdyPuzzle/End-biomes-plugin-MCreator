@@ -18,4 +18,12 @@ public abstract class ChorusFlowerBlockMixin extends Block {
 		}
 	}
 
+	@WrapOperation(method = "randomTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;canSustainPlant(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/util/TriState;"))
+	private TriState canSustainChorus(BlockState soil, BlockGetter world, BlockPos soilPos, Direction facing, BlockState plant, Operation<TriState> original) {
+		if (<#list endstones as endstone>soil.is(${mappedBlockToBlock(endstone.block)})<#sep> || </#list>) {
+			return TriState.TRUE;
+		}
+		return original.call(soil, world, soilPos, facing, plant);
+	}
+
 }
