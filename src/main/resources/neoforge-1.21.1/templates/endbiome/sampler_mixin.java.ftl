@@ -1,16 +1,21 @@
 package ${package}.mixin;
 
 import com.google.common.base.Preconditions;
-
 import org.spongepowered.asm.mixin.Unique;
 
+/**
+ * Gives every {@link Climate.Sampler} the world seed and a noise used to pick weighted custom end biomes.
+ *
+ * <p>Every mod generated with the End biomes plugin adds the {@link SamplerHooks} methods to this class, Mixin keeps
+ * the implementation of whichever mod is applied first. The fields are @Unique so each implementation keeps its own.</p>
+ */
 @Mixin(Climate.Sampler.class)
 public class ClimateSamplerMixin implements SamplerHooks {
-    @Unique
-    private Long seed = null;
+	@Unique
+	private Long seed = null;
 
-    @Unique
-    private ImprovedNoise endBiomesSampler = null;
+	@Unique
+	private ImprovedNoise endBiomesSampler = null;
 
 	@Override
 	public void setSeed(long seed) {

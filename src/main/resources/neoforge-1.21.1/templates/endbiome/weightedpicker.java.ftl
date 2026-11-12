@@ -36,6 +36,13 @@ public final class WeightedPicker<T> {
 	}
 
 	/**
+	 * Returns an independent copy that entries can be added to without affecting this picker.
+	 */
+	WeightedPicker<T> copy() {
+		return new WeightedPicker<>(currentTotal, new ArrayList<>(entries));
+	}
+
+	/**
 	 * Applies a mapping function to each entry and returns a picker with otherwise equivalent settings.
 	 */
 	<U> WeightedPicker<U> map(Function<T, U> mapper) {

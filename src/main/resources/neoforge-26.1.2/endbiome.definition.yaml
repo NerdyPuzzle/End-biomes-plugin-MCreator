@@ -11,6 +11,8 @@ global_templates:
     name: "@SRCROOT/@BASEPACKAGEPATH/endbiomes/TheEndBiomes.java"
   - template: endbiome/sampler_hooks.java.ftl
     name: "@SRCROOT/@BASEPACKAGEPATH/endbiomes/SamplerHooks.java"
+  - template: endbiome/endbiomes_interop.java.ftl
+    name: "@SRCROOT/@BASEPACKAGEPATH/endbiomes/EndBiomesInterop.java"
   - template: endbiome/sampler_mixin.java.ftl
     name: "@SRCROOT/@BASEPACKAGEPATH/mixin/ClimateSamplerMixin.java"
   - template: endbiome/noiseconfig_mixin.java.ftl
@@ -22,4 +24,4 @@ global_templates:
   - template: endbiome/endbiomes_registry.java.ftl
     name: "@SRCROOT/@BASEPACKAGEPATH/init/@JavaModNameEndBiomes.java"
   - template: endbiome/endbiomes_surfacerules.java.ftl
-    name: "@SRCROOT/@BASEPACKAGEPATH/init/@JavaModNameSurfaceRules.java"
+    name: "@SRCROOT/@BASEPACKAGEPATH/init/@JavaModNameSurfaceRules.java"

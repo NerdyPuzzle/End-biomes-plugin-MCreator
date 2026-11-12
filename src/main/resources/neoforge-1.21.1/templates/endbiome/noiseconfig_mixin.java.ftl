@@ -1,13 +1,12 @@
 package ${package}.mixin;
 
+/** Hands the world seed to the climate sampler of every {@link RandomState}. */
 @Mixin(RandomState.class)
 public class NoiseConfigMixin {
-	@Shadow
-	@Final
-	private Climate.Sampler sampler;
 
 	@Inject(method = "<init>", at = @At("TAIL"))
-	private void init(NoiseGeneratorSettings chunkGeneratorSettings, HolderGetter<NormalNoise.NoiseParameters> arg, long seed, CallbackInfo ci) {
-		((SamplerHooks) (Object) sampler).setSeed(seed);
+	private void init(CallbackInfo ci, @Local(argsOnly = true) long seed) {
+		((SamplerHooks) (Object) ((RandomState) (Object) this).sampler()).setSeed(seed);
 	}
+
 }

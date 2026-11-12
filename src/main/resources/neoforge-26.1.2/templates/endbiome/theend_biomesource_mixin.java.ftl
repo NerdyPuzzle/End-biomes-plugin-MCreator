@@ -1,106 +1,97 @@
 package ${package}.mixin;
 
 import com.google.common.base.Suppliers;
-
-import com.mojang.serialization.Codec;
-
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Unique;
 
-import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
+/**
+ * Adds the weighted custom biomes of every installed mod made with the End biomes plugin to {@link TheEndBiomeSource}.
+ *
+ * <p>Each of those mods ships its own copy of this mixin. They cooperate through the shared fields below and through
+ * {@link EndBiomesInterop}, so every injector here only <em>adds</em> to vanilla behaviour and never cancels it.</p>
+ */
 @Mixin(TheEndBiomeSource.class)
 public class TheEndBiomeSourceMixin extends BiomeSourceMixin {
-    private List<Supplier<Object>> overrides = new ArrayList<>();
-    @Unique
-    private boolean biomeMapModified = false;
+
+	/*
+	 * CROSS-MOD CONTRACT - shared state.
+	 *
+	 * These fields are deliberately NOT @Unique: Mixin merges a field added by several mixins into one field when the
+	 * name and type match, which is how the copies of this mixin in different mods find each other.
+	 * Never rename them, change their type or mark them @Unique.
+	 *
+	 * overrides       - one memoized TheEndBiomeData.Overrides per installed mod, entry 0 is the "primary" one that
+	 *                   every mod picks biomes from (used by every plugin version).
+	 * overridesMerged - set once the biomes of the other entries have been merged into entry 0
+	 *                   (shared by mods that ship EndBiomesInterop; older mods track this with their own @Unique flag).
+	 */
+	private List<Supplier<Object>> overrides = new ArrayList<>();
+	private volatile boolean endbiomes$overridesMerged;
+
 	@Shadow
 	@Mutable
 	@Final
 	static MapCodec<TheEndBiomeSource> CODEC;
 
 	/**
-	 * Modifies the codec, so it calls the static factory method that gives us access to the
-	 * full biome registry instead of just the pre-defined biomes that vanilla uses.
+	 * Swaps the codec for one that goes through {@link TheEndBiomeSource#create}, so the full biome registry can be
+	 * captured instead of only the five vanilla biomes.
 	 */
 	@Inject(method = "<clinit>", at = @At("TAIL"))
 	private static void modifyCodec(CallbackInfo ci) {
-		CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-			return instance.group(RegistryOps.retrieveGetter(Registries.BIOME)).apply(instance, instance.stable(TheEndBiomeSource::create));
-		});
+		CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(RegistryOps.retrieveGetter(Registries.BIOME))
+				.apply(instance, instance.stable(TheEndBiomeSource::create)));
 	}
 
-	/**
-	 * Captures the biome registry at the beginning of the static factory method to allow access to it in the
-	 * constructor.
-	 */
+	/** Captures the biome registry so the constructor below can resolve custom biomes. */
 	@Inject(method = "create", at = @At("HEAD"))
-	private static void rememberLookup(HolderGetter<Biome> biomes, CallbackInfoReturnable<?> ci) {
+	private static void rememberLookup(HolderGetter<Biome> biomes, CallbackInfoReturnable<?> cir) {
 		TheEndBiomeData.biomeRegistry.set(biomes);
 	}
 
-	/**
-	 * Frees up the captured biome registry.
-	 */
 	@Inject(method = "create", at = @At("TAIL"))
-	private static void clearLookup(HolderGetter<Biome> biomes, CallbackInfoReturnable<?> ci) {
+	private static void clearLookup(CallbackInfoReturnable<?> cir) {
 		TheEndBiomeData.biomeRegistry.remove();
 	}
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(Holder<Biome> centerBiome, Holder<Biome> highlandsBiome, Holder<Biome> midlandsBiome, Holder<Biome> smallIslandsBiome, Holder<Biome> barrensBiome, CallbackInfo ci) {
+	@Inject(method = "<init>", at = @At("RETURN"))
+	private void init(CallbackInfo ci) {
 		HolderGetter<Biome> biomes = TheEndBiomeData.biomeRegistry.get();
-
 		if (biomes == null) {
-			throw new IllegalStateException("Biome registry not set by Mixin");
+			// Built without going through TheEndBiomeSource.create (e.g. by another mod): leave this source vanilla
+			EndBiomesInterop.LOGGER.error("TheEndBiomeSource was created without the biome registry, custom end biomes of ${modid} will not generate in it");
+			return;
 		}
 
-		overrides.add(Suppliers.memoize(() -> {
-			return (Object) TheEndBiomeData.createOverrides(biomes);
-		}));
+		overrides.add(Suppliers.memoize(() -> (Object) TheEndBiomeData.createOverrides(biomes)));
+	}
 
-    }
-
-	@Inject(method = "getNoiseBiome", at = @At("RETURN"), cancellable = true)
-    private void getWeightedEndBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler noise, CallbackInfoReturnable<Holder<Biome>> cir) {
-            try {
-				if (!biomeMapModified) {
-				    boolean first = true;
-				    for (Supplier<Object> mod : overrides) {
-				        if (!first) {
-				            List<List<Object>> endbiomes = (List<List<Object>>) mod.get().getClass().getField("endBiomesCopy").get(mod.get());
-				            List<List<Object>> midlandsbiomes = (List<List<Object>>) mod.get().getClass().getField("midlandsBiomesCopy").get(mod.get());
-				            List<List<Object>> barrensbiomes = (List<List<Object>>) mod.get().getClass().getField("barrensBiomesCopy").get(mod.get());
-				            overrides.get(0).get().getClass().getMethod("addExternalModBiomes", List.class, String.class).invoke(overrides.get(0).get(), endbiomes, "end");
-				            overrides.get(0).get().getClass().getMethod("addExternalModBiomes", List.class, String.class).invoke(overrides.get(0).get(), midlandsbiomes, "midlands");
-				            overrides.get(0).get().getClass().getMethod("addExternalModBiomes", List.class, String.class).invoke(overrides.get(0).get(), barrensbiomes, "barrens");
-				        }
-				        first = false;
-				    }
-				    overrides.get(0).get().getClass().getMethod("initBiomes").invoke(overrides.get(0).get());
-				    biomeMapModified = true;
-				}
-				Supplier<Object> override = overrides.get(0);
-                Holder<Biome> picked = (Holder<Biome>) override.get().getClass().getMethod("pick", int.class, int.class, int.class, Climate.Sampler.class, Holder.class).invoke(override.get(), biomeX, biomeY, biomeZ, noise, cir.getReturnValue());
-				cir.setReturnValue(picked);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-    }
+	@ModifyReturnValue(method = "getNoiseBiome", at = @At("RETURN"))
+	private Holder<Biome> getWeightedEndBiome(Holder<Biome> biome,
+			@Local(argsOnly = true, ordinal = 0) int biomeX, @Local(argsOnly = true, ordinal = 1) int biomeY,
+			@Local(argsOnly = true, ordinal = 2) int biomeZ, @Local(argsOnly = true) Climate.Sampler noise) {
+		mergeOverrides();
+		return EndBiomesInterop.pick(overrides, biomeX, biomeY, biomeZ, noise, biome);
+	}
 
 	@Override
 	protected Set<Holder<Biome>> modifyBiomeSet(Set<Holder<Biome>> biomes) {
-	    try {
-	        var modifiedBiomes = new LinkedHashSet<>(biomes);
-		    for (Supplier<Object> override : overrides) {
-		        Field field = override.get().getClass().getField("customBiomes");
-			    modifiedBiomes.addAll(((Set<Holder<Biome>>)field.get(override.get())));
+		return EndBiomesInterop.withCustomBiomes(overrides, biomes);
+	}
+
+	/** Merges the biomes of every other mod into the primary overrides, once per biome source. */
+	@Unique
+	private void mergeOverrides() {
+		if (!endbiomes$overridesMerged) {
+			synchronized (overrides) {
+				if (!endbiomes$overridesMerged) {
+					EndBiomesInterop.mergeInto(overrides);
+					endbiomes$overridesMerged = true;
+				}
 			}
-			return Collections.unmodifiableSet(modifiedBiomes);
-		} catch (Exception e) {
-		    e.printStackTrace();
 		}
-		return biomes;
 	}
 
 }

@@ -2,49 +2,49 @@ package ${package}.mixin;
 
 <#include "../mcitems.ftl">
 
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
 
+/** Lets chorus plants survive on and connect down to this mod's end stone blocks. */
 @Mixin(ChorusPlantBlock.class)
-public abstract class ChorusPlantBlockMixin extends Block {
-    public ChorusPlantBlockMixin(Properties settings) {
-        super(settings);
-    }
+public abstract class ChorusPlantBlockMixin {
 
-	@Inject(method = "canSurvive", at = @At("HEAD"), cancellable = true)
-	private void canSurvive(BlockState state, LevelReader world, BlockPos pos, CallbackInfoReturnable<Boolean> info) {
-        BlockState blockstate = world.getBlockState(pos.below());
-		if (<#list endstones as endstone>blockstate.is(${mappedBlockToBlock(endstone.block)}) ||</#list> blockstate.is(Blocks.END_STONE)) {
-			info.setReturnValue(true);
-		}
+	@ModifyReturnValue(method = "canSurvive", at = @At("RETURN"))
+	private boolean canSurviveOnEndstone(boolean canSurvive, @Local(argsOnly = true) LevelReader world, @Local(argsOnly = true) BlockPos pos) {
+		return canSurvive || supportsChorus(world.getBlockState(pos.below()));
 	}
 
-	@Inject(method = "updateShape", at = @At("RETURN"), cancellable = true)
-	private void updateShape(BlockState state, Direction direction, BlockState newState, LevelAccessor world, BlockPos pos, BlockPos posFrom, CallbackInfoReturnable<BlockState> info) {
-		BlockState plant = info.getReturnValue();
-		BlockState blockstate = world.getBlockState(pos.below());
-		if (plant.is(Blocks.CHORUS_PLANT) && (<#list endstones as endstone>blockstate.is(${mappedBlockToBlock(endstone.block)}) ||</#list> blockstate.is(Blocks.END_STONE))) {
-			plant = plant.setValue(BlockStateProperties.DOWN, true);
-			info.setReturnValue(plant);
-		}
+	@ModifyReturnValue(method = "updateShape", at = @At("RETURN"))
+	private BlockState connectOnShapeUpdate(BlockState plant, @Local(argsOnly = true) LevelAccessor world, @Local(argsOnly = true, ordinal = 0) BlockPos pos) {
+		return connectDown(plant, world.getBlockState(pos.below()));
 	}
 
-	@Inject(method = "getStateForPlacement(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("RETURN"), cancellable = true)
-	private void getStateForPlacement(BlockPlaceContext ctx, CallbackInfoReturnable<BlockState> info) {
-		BlockPos pos = ctx.getClickedPos();
-		Level world = ctx.getLevel();
-		BlockState plant = info.getReturnValue();
-		BlockState blockstate = world.getBlockState(pos.below());
-		if (ctx.canPlace() && plant.is(Blocks.CHORUS_PLANT) && (<#list endstones as endstone>blockstate.is(${mappedBlockToBlock(endstone.block)}) ||</#list> blockstate.is(Blocks.END_STONE))) {
-			info.setReturnValue(plant.setValue(BlockStateProperties.DOWN, true));
-		}
+	@ModifyReturnValue(method = "getStateForPlacement(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("RETURN"))
+	private BlockState connectOnPlacement(BlockState plant, @Local(argsOnly = true) BlockPlaceContext ctx) {
+		return ctx.canPlace() ? connectDown(plant, ctx.getLevel().getBlockState(ctx.getClickedPos().below())) : plant;
 	}
 
-	@Inject(method = "getStateWithConnections", at = @At("RETURN"), cancellable = true)
-	private static void getStateWithConnections(BlockGetter blockGetter, BlockPos blockPos, BlockState defaultState, CallbackInfoReturnable<BlockState> info) {
-		BlockState blockstate = blockGetter.getBlockState(blockPos.below());
-		if (<#list endstones as endstone>blockstate.is(${mappedBlockToBlock(endstone.block)})<#sep> || </#list>) {
-			info.setReturnValue(info.getReturnValue().trySetValue(BlockStateProperties.DOWN, true));
-		}
+	@ModifyReturnValue(method = "getStateWithConnections", at = @At("RETURN"))
+	private static BlockState connectWithEndstone(BlockState state, @Local(argsOnly = true) BlockGetter blockGetter, @Local(argsOnly = true) BlockPos blockPos) {
+		return isEndstone(blockGetter.getBlockState(blockPos.below())) ? state.trySetValue(BlockStateProperties.DOWN, true) : state;
+	}
+
+	@Unique
+	private static boolean isEndstone(BlockState state) {
+		return <#list endstones as endstone>state.is(${mappedBlockToBlock(endstone.block)})<#sep> || </#list>;
+	}
+
+	@Unique
+	private static boolean supportsChorus(BlockState state) {
+		return isEndstone(state) || state.is(Blocks.END_STONE);
+	}
+
+	@Unique
+	private static BlockState connectDown(BlockState plant, BlockState below) {
+		return plant.is(Blocks.CHORUS_PLANT) && supportsChorus(below) ? plant.setValue(BlockStateProperties.DOWN, true) : plant;
 	}
 
 }

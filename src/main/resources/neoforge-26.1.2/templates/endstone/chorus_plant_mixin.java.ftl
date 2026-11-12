@@ -2,51 +2,42 @@ package ${package}.mixin;
 
 <#include "../mcitems.ftl">
 
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
 
+/** Lets chorus plants survive on and connect down to this mod's end stone blocks. */
 @Mixin(ChorusPlantBlock.class)
-public abstract class ChorusPlantBlockMixin extends PipeBlock {
-    public ChorusPlantBlockMixin(Properties settings) {
-        super(0.3125F, settings);
-    }
+public abstract class ChorusPlantBlockMixin {
 
-	@Inject(method = "canSurvive", at = @At("HEAD"), cancellable = true)
-	private void canSurvive(BlockState state, LevelReader world, BlockPos pos, CallbackInfoReturnable<Boolean> info) {
-        BlockState blockstate = world.getBlockState(pos.below());
-		if (<#list endstones as endstone>blockstate.is(${mappedBlockToBlock(endstone.block)}) ||</#list> blockstate.is(Blocks.END_STONE)) {
-			info.setReturnValue(true);
-		}
+	@ModifyReturnValue(method = "canSurvive", at = @At("RETURN"))
+	private boolean canSurviveOnEndstone(boolean canSurvive, @Local(argsOnly = true) LevelReader world, @Local(argsOnly = true) BlockPos pos) {
+		return canSurvive || supportsChorus(world.getBlockState(pos.below()));
 	}
 
-	@Inject(method = "getStateForPlacement(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("RETURN"), cancellable = true)
-	private void getStateForPlacement(BlockPlaceContext ctx, CallbackInfoReturnable<BlockState> info) {
-		BlockPos pos = ctx.getClickedPos();
-		Level world = ctx.getLevel();
-		BlockState plant = info.getReturnValue();
-		BlockState blockstate = world.getBlockState(pos.below());
-		if (ctx.canPlace() && (plant.is(Blocks.CHORUS_PLANT) || plant.is(Blocks.CHORUS_FLOWER)) && (<#list endstones as endstone>blockstate.is(${mappedBlockToBlock(endstone.block)}) ||</#list> blockstate.is(Blocks.END_STONE))) {
-			info.setReturnValue(plant.setValue(BlockStateProperties.DOWN, true));
-		}
+	@ModifyReturnValue(method = "getStateForPlacement(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("RETURN"))
+	private BlockState connectOnPlacement(BlockState plant, @Local(argsOnly = true) BlockPlaceContext ctx) {
+		if (ctx.canPlace() && (plant.is(Blocks.CHORUS_PLANT) || plant.is(Blocks.CHORUS_FLOWER)) && supportsChorus(ctx.getLevel().getBlockState(ctx.getClickedPos().below())))
+			return plant.trySetValue(BlockStateProperties.DOWN, true);
+		return plant;
 	}
 
-	@Inject(method = "getStateWithConnections", at = @At("HEAD"), cancellable = true)
-    private static void getStateWithConnections(BlockGetter p_51711_, BlockPos p_51712_, BlockState p_304771_, CallbackInfoReturnable<BlockState> cir) {
-        BlockState blockstate = p_51711_.getBlockState(p_51712_.below());
-        Block block = p_304771_.getBlock();
-        boolean flag = <#list endstones as endstone>blockstate.is(${mappedBlockToBlock(endstone.block)}) ||</#list> blockstate.is(block) || blockstate.is(Blocks.CHORUS_FLOWER) || blockstate.is(Blocks.END_STONE);
-        if (flag) {
-            BlockState blockstate1 = p_51711_.getBlockState(p_51712_.above());
-            BlockState blockstate2 = p_51711_.getBlockState(p_51712_.north());
-            BlockState blockstate3 = p_51711_.getBlockState(p_51712_.east());
-            BlockState blockstate4 = p_51711_.getBlockState(p_51712_.south());
-            BlockState blockstate5 = p_51711_.getBlockState(p_51712_.west());
-            var soilDecision = blockstate.canSustainPlant(p_51711_, p_51712_.below(), Direction.UP, p_304771_);
-            cir.setReturnValue(p_304771_.trySetValue(DOWN, Boolean.valueOf(flag || soilDecision.isTrue()))
-                .trySetValue(UP, Boolean.valueOf(blockstate1.is(block) || blockstate1.is(Blocks.CHORUS_FLOWER)))
-                .trySetValue(NORTH, Boolean.valueOf(blockstate2.is(block) || blockstate2.is(Blocks.CHORUS_FLOWER)))
-                .trySetValue(EAST, Boolean.valueOf(blockstate3.is(block) || blockstate3.is(Blocks.CHORUS_FLOWER)))
-                .trySetValue(SOUTH, Boolean.valueOf(blockstate4.is(block) || blockstate4.is(Blocks.CHORUS_FLOWER)))
-                .trySetValue(WEST, Boolean.valueOf(blockstate5.is(block) || blockstate5.is(Blocks.CHORUS_FLOWER))));
-        }
-    }
+	// The chorus plant, chorus flower and end stone cases already connect down in NeoForge, only the end stones are missing
+	@ModifyReturnValue(method = "getStateWithConnections", at = @At("RETURN"))
+	private static BlockState connectWithEndstone(BlockState state, @Local(argsOnly = true) BlockGetter blockGetter, @Local(argsOnly = true) BlockPos blockPos) {
+		return isEndstone(blockGetter.getBlockState(blockPos.below())) ? state.trySetValue(BlockStateProperties.DOWN, true) : state;
+	}
+
+	@Unique
+	private static boolean isEndstone(BlockState state) {
+		return <#list endstones as endstone>state.is(${mappedBlockToBlock(endstone.block)})<#sep> || </#list>;
+	}
+
+	@Unique
+	private static boolean supportsChorus(BlockState state) {
+		return isEndstone(state) || state.is(Blocks.END_STONE);
+	}
+
 }
