@@ -62,13 +62,11 @@ public final class TheEndBiomeData {
 	}
 
 	/**
-	 * An instance of this class is attached to each {@link TheEndBiomeSource}.
-	 *
-	 * <p>CROSS-MOD CONTRACT: other mods access the public members marked below by name through reflection
-	 * (see {@link EndBiomesInterop}). Never rename them or change their signatures.</p>
+	 * An instance of this class is attached to each {@link TheEndBiomeSource}. Other mods use the public members marked
+	 * below through {@link EndBiomesInterop}.
 	 */
 	public static class Overrides {
-		// Shared with other mods: marks overrides that ignore biome lists they already merged (added with EndBiomesInterop)
+		// Shared with other mods: marks overrides that ignore biome lists they already merged
 		public static final int API_VERSION = 2;
 
 		// Shared with other mods: biomes this instance adds to the possible biomes

@@ -12,19 +12,6 @@ import java.lang.reflect.Method;
  * (see {@code TheEndBiomeSourceMixin}). Every mod has its own {@code Overrides} class in its own package, so instances
  * that belong to another mod can only be reached through reflection. Instances of this mod's own class are called
  * directly, and the reflective lookups are resolved once per class.</p>
- *
- * <p>CROSS-MOD CONTRACT: mods generated with every version of the plugin look these members up by name, so they must
- * stay public on {@code TheEndBiomeData.Overrides} with these exact names and signatures:</p>
- * <ul>
- * <li>{@code List<List<Object>> endBiomesCopy, midlandsBiomesCopy, barrensBiomesCopy} - each entry is
- * {@code List.of(ResourceKey<Biome> parent, ResourceKey<Biome> biome, Double weight)}</li>
- * <li>{@code Set<Holder<Biome>> customBiomes}</li>
- * <li>{@code void addExternalModBiomes(List<List<Object>> biomes, String type)} - type is "end", "midlands" or "barrens"</li>
- * <li>{@code void initBiomes()}</li>
- * <li>{@code Holder<Biome> pick(int x, int y, int z, Climate.Sampler noise, Holder<Biome> vanillaBiome)}</li>
- * <li>{@code static final int API_VERSION} - only on overrides generated together with this class, whose
- * {@code addExternalModBiomes} ignores lists it already added</li>
- * </ul>
  */
 public final class EndBiomesInterop {
 
@@ -55,8 +42,7 @@ public final class EndBiomesInterop {
 		Object primary;
 		try {
 			primary = overrides.get(0).get();
-			// The primary overrides belong to a mod generated with an older plugin version: that mod's own getNoiseBiome
-			// injector merges every mod into them, merging here too would count the other mods' biomes twice.
+			// Overrides without API_VERSION have the biomes of every mod merged into them by their own mod already
 			if (!(primary instanceof TheEndBiomeData.Overrides) && !CONTRACTS.get(primary.getClass()).mergesExactlyOnce)
 				return;
 		} catch (RuntimeException e) {

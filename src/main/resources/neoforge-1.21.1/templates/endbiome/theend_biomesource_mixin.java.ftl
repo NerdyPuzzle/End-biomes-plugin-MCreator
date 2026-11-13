@@ -14,16 +14,12 @@ import org.spongepowered.asm.mixin.Unique;
 public class TheEndBiomeSourceMixin extends BiomeSourceMixin {
 
 	/*
-	 * CROSS-MOD CONTRACT - shared state.
-	 *
-	 * These fields are deliberately NOT @Unique: Mixin merges a field added by several mixins into one field when the
-	 * name and type match, which is how the copies of this mixin in different mods find each other.
-	 * Never rename them, change their type or mark them @Unique.
+	 * Not @Unique: Mixin merges these fields with the same fields of the copies of this mixin in other mods, which is
+	 * how the copies find each other.
 	 *
 	 * overrides       - one memoized TheEndBiomeData.Overrides per installed mod, entry 0 is the "primary" one that
-	 *                   every mod picks biomes from (used by every plugin version).
-	 * overridesMerged - set once the biomes of the other entries have been merged into entry 0
-	 *                   (shared by mods that ship EndBiomesInterop; older mods track this with their own @Unique flag).
+	 *                   every mod picks biomes from.
+	 * overridesMerged - set once the biomes of the other entries have been merged into entry 0.
 	 */
 	private List<Supplier<Object>> overrides = new ArrayList<>();
 	private volatile boolean endbiomes$overridesMerged;
