@@ -5,8 +5,6 @@ package ${package}.endbiomes;
  *
  */
 public final class TheEndBiomes {
-	private TheEndBiomes() {
-	}
 
 	/**
 	 * <p>Adds the biome as a main end island biome with the specified weight; note that this includes the main island

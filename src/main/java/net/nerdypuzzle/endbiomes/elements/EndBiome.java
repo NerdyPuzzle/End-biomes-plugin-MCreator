@@ -3,8 +3,6 @@ package net.nerdypuzzle.endbiomes.elements;
 import net.mcreator.element.GeneratableElement;
 import net.mcreator.workspace.elements.ModElement;
 
-import java.util.List;
-
 public class EndBiome extends GeneratableElement {
     public String biome;
     public String generationType;
@@ -14,7 +12,6 @@ public class EndBiome extends GeneratableElement {
     public Number midlandsWeight;
     public Number barrensWeight;
 
-    public List<String> mixins = List.of("BiomeSourceMixin", "TheEndBiomeSourceMixin", "ClimateSamplerMixin", "NoiseConfigMixin", "ChunkNoiseSamplerMixin", "NoiseGeneratorSettingsAccess");
     public EndBiome(ModElement element) {
         super(element);
     }

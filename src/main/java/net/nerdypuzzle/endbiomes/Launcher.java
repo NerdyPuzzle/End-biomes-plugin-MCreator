@@ -40,7 +40,6 @@ public class Launcher extends JavaPlugin {
 						disableComponent(biome, BiomeGUI.class.getDeclaredField("genContinentalness"));
 						disableComponent(biome, BiomeGUI.class.getDeclaredField("genErosion"));
 						disableComponent(biome, BiomeGUI.class.getDeclaredField("genWeirdness"));
-						disableComponent(biome, BiomeGUI.class.getDeclaredField("treesPerChunk"));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

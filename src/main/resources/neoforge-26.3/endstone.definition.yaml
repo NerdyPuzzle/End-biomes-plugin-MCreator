@@ -1,0 +1,9 @@
+global_templates:
+  - template: endstone/chorus_flower_mixin.java.ftl
+    name: "@SRCROOT/@BASEPACKAGEPATH/mixin/ChorusFlowerBlockMixin.java"
+  - template: endstone/chorus_plant_mixin.java.ftl
+    name: "@SRCROOT/@BASEPACKAGEPATH/mixin/ChorusPlantBlockMixin.java"
+
+fragments:
+  - type: mixin
+    content: [ ChorusFlowerBlockMixin, ChorusPlantBlockMixin ]

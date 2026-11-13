@@ -2,8 +2,6 @@ package net.nerdypuzzle.endbiomes.elements;
 
 import net.mcreator.element.ModElementType;
 import net.mcreator.element.types.Biome;
-import net.mcreator.generator.GeneratorFlavor;
-import net.mcreator.plugin.PluginLoader;
 import net.mcreator.ui.MCreator;
 import net.mcreator.ui.MCreatorApplication;
 import net.mcreator.ui.component.SearchableComboBox;
@@ -122,8 +120,6 @@ public class EndBiomeGUI extends ModElementGUI<EndBiome> {
     }
 
     protected AggregatedValidationResult validatePage() {
-        if (PluginLoader.INSTANCE.getPlugins().stream().filter((plugin) -> { return plugin.getID().equals("forge_mixins"); }).toList().isEmpty() && mcreator.getGenerator().getGeneratorConfiguration().getGeneratorFlavor() != GeneratorFlavor.FABRIC)
-            return new AggregatedValidationResult.FAIL(L10N.t("elementgui.endbiome.needs_mixins", new Object[0]));
         if (biome.getSelectedItem() == null)
             return new AggregatedValidationResult.FAIL(L10N.t("elementgui.endbiome.needs_biome", new Object[0]));
         if (isEndBiome(biome.getSelectedItem(), getModElement(), mcreator))
